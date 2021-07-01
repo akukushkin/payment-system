@@ -2,10 +2,11 @@ package get_operations
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/csv"
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"payment-system/internal/wallet"
 )
@@ -48,19 +49,17 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	operationDTOs := make([]OperationDTO, 0, len(operations))
+	records := make([][]string, 0, len(operations)+1)
+	records = append(records, []string{"wallet_id", "value", "direction", "date"})
 	for _, operation := range operations {
-		operationDTO := OperationDTO{
-			WalletID:  operation.WalletID,
-			Value:     operation.Value,
-			Direction: operation.Direction,
-			Date:      operation.Date,
-		}
-		operationDTOs = append(operationDTOs, operationDTO)
+		walletID := strconv.FormatInt(operation.WalletID, 10)
+		value := strconv.FormatFloat(operation.Value, 'f', 2, 64)
+		direction := strconv.Itoa(int(operation.Direction))
+		record := []string{walletID, value, direction, operation.Date}
+		records = append(records, record)
 	}
 
-	if err = json.NewEncoder(w).Encode(operationDTOs); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+	if err = csv.NewWriter(w).WriteAll(records); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		if _, err := w.Write([]byte(err.Error())); err != nil {
 			log.Printf("failed to write error message: %s\n", err)

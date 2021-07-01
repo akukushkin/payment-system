@@ -2,8 +2,8 @@ POST http://localhost:8080/getOperations
 Content-Type: application/json
 
 {
-  "wallet_id": 2,
-  "date": "2021-06-30",
+  "wallet_id": 53,
+  "date": "2021-07-01",
   "direction": 0
 }
 
@@ -24,7 +24,7 @@ Content-Type: application/json
 
 {
   "idempotency_key": "test",
-  "wallet_id": 1,
+  "wallet_id": 53,
   "value": 1000.50
 }
 

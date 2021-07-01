@@ -2,6 +2,7 @@ package test
 
 import (
 	"bytes"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -96,29 +97,29 @@ func TestHappyPath(t *testing.T) {
 	}
 	operations, err := getOperations(&httpClient, filterDTO)
 	require.NoError(t, err)
-	require.Len(t, operations, 1)
+	require.Len(t, operations, 2)
 
 	// get income operation by 2nd wallet
 	filterDTO.WalletID = toWalletID
 	operations, err = getOperations(&httpClient, filterDTO)
 	require.NoError(t, err)
-	require.Len(t, operations, 2)
+	require.Len(t, operations, 3)
 
 	// get outcome operation by 1st wallet
 	filterDTO.WalletID = fromWalletID
 	filterDTO.Direction = 1
 	operations, err = getOperations(&httpClient, filterDTO)
 	require.NoError(t, err)
-	require.Len(t, operations, 2)
+	require.Len(t, operations, 3)
 
 	// get outcome operation by 2nd wallet
 	filterDTO.WalletID = toWalletID
 	operations, err = getOperations(&httpClient, filterDTO)
 	require.NoError(t, err)
-	require.Len(t, operations, 0)
+	require.Len(t, operations, 1)
 }
 
-func getOperations(client *http.Client, in get_operations.FilterDTO) ([]get_operations.OperationDTO, error) {
+func getOperations(client *http.Client, in get_operations.FilterDTO) ([][]string, error) {
 	marshaled, err := json.Marshal(in)
 	if err != nil {
 		return nil, err
@@ -142,13 +143,7 @@ func getOperations(client *http.Client, in get_operations.FilterDTO) ([]get_oper
 		return nil, fmt.Errorf("unsuccess status code")
 	}
 
-	var out []get_operations.OperationDTO
-	err = json.NewDecoder(resp.Body).Decode(&out)
-	if err != nil {
-		return nil, err
-	}
-
-	return out, nil
+	return csv.NewReader(resp.Body).ReadAll()
 }
 
 func transferMoney(client *http.Client, in transfer_money.TransferDTO) error {
