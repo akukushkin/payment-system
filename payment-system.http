@@ -1,0 +1,39 @@
+POST http://localhost:8080/getOperations
+Content-Type: application/json
+
+{
+  "wallet_id": 2,
+  "date": "2021-06-30",
+  "direction": 0
+}
+
+###
+POST http://localhost:8080/transferMoney
+Content-Type: application/json
+
+{
+  "idempotency_key": "test126122",
+  "from_wallet_id": 1,
+  "to_wallet_id": 2,
+  "value": 1000.50
+}
+
+###
+POST http://localhost:8080/depositMoney
+Content-Type: application/json
+
+{
+  "idempotency_key": "test",
+  "wallet_id": 1,
+  "value": 1000.50
+}
+
+###
+POST http://localhost:8080/addWallet
+Content-Type: application/json
+
+{
+  "idempotency_key": "test126"
+}
+
+###
